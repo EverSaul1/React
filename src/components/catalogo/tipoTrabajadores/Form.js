@@ -1,0 +1,207 @@
+import React, { Component } from 'react'
+import PropTypes from 'prop-types'
+import Card, { CardHeader, CardContent } from 'material-ui/Card'
+import Avatar from 'material-ui/Avatar'
+import Button from 'material-ui/Button';
+import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
+//import Typography from 'material-ui/Typography'
+//import TextField from 'material-ui/TextField';
+
+import { save, getById, update } from '../../../actions/tipoTrabajador-action'
+import { connect } from 'react-redux';
+
+const styles = theme => ({
+    button: {
+      margin: theme.spacing.unit,
+    },
+    
+  });
+
+
+class Form extends Component {
+    /*
+        constructor(props) {
+            super(props);
+            this.state = {
+                d: {
+                    codigo: '',
+                    nombre: '',
+                },
+                saving: false
+            }
+        }*/
+    constructor(props) {
+        super(props);
+        this.state = {
+            id: props.data ? props.data.id : null,
+            nombre: props.data ? props.data.nombre : ''
+
+        }
+    }
+    /*
+        componentWillReceiveProps = (nextProps) => { // Load Asynchronously
+            const { data } = nextProps;
+            console.log('componentWillReceiveProps data:' + JSON.stringify(data))
+            this.setState({
+                id: data.id,
+                codigo: data.codigo,
+                nombre: data.nombre
+            })
+        }
+    */
+    componentWillMount = () => {
+        /*
+        const { id } = this.props.match.params
+        if (id) {
+            //this.props.getById(id)
+            //this.props.getItemAsync(id)
+
+            this.props.getById(id).then(data => {
+                console.log('componentWillReceiveProps data:' + JSON.stringify(data))
+                this.setState({
+                    id: data.id,
+                    codigo: data.codigo,
+                    nombre: data.nombre
+                })
+            }).catch(e => {
+
+            });
+        }
+        */
+    }
+
+
+    componentDidMount = () => {
+        const { id } = this.props.match.params
+        if (id) {
+            this.props.getById(id).then(data => {
+                this.setState({
+                    id: data.id,
+                    nombre: data.nombre,
+
+
+                });
+            });
+        }
+    }
+
+    handleChange = (event) => {
+        //this.setState({ value: event.target.value });
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+    }
+
+    handleSubmit = (event) => {
+        const { id } = this.props.match.params
+        if (id) {
+            //console.log('handleSubmit state:' + JSON.stringify(this.state))
+            this.props.update(this.state, this.props.history)
+        } else {
+            this.props.save(this.state, this.props.history)
+        }
+        //this.props.history.push('/categorias/list');
+        event.preventDefault();
+    }
+    
+    render() {
+        
+        //const { data } = this.props
+        return (
+            <Card>
+                <CardHeader
+                    avatar={
+                        <Avatar src="http://www.josephandmeryschool.edu.pe/images/03-icono-empleados.png" >
+                            
+                          </Avatar>
+                    }
+                    title="FORMULARIO"
+                    subheader=""
+                />
+                <CardContent>
+                    <form >
+
+                        <InputLabel >Nombre</InputLabel>
+                        <Input
+
+                            type="text"
+                            name="nombre"
+                            
+                            value={this.state.nombre}
+                            onChange={this.handleChange}
+                            startAdornment={<InputAdornment position="start"> : </InputAdornment>}
+                        />
+
+
+                    </form>
+
+
+                </CardContent>
+                <CardContent>
+                    <form onSubmit={this.handleSubmit}>
+                        <Button
+                            raised
+                            color="primary"
+                            type="submit"
+                            margin="normal"
+                        >
+                            Guardar
+                        </Button>
+                        {'  '}
+                        <Button
+                            raised
+                            color="accent"
+                            type="reset"
+                            
+                            margin="normal"
+                            onClick={(e) => this.props.history.push('/catalogo/tipoTrabajadores/list')}>
+                        
+                            cancelar
+                        </Button>
+                        
+                     </form>
+
+
+                </CardContent>
+            </Card>
+        )
+    }
+}
+
+
+
+Form.propTypes = {
+    data: PropTypes.object
+}
+
+const mapStateToProps = (state, props) => {
+    if (props.match.params.id) {
+        return {
+            data: state.tipoTrabajador.list.find(item => item.id + '' === props.match.params.id + '')
+        }
+    }
+    return {
+        data: null
+    }
+
+}
+/*
+const mapDispatchToProps = (dispatch) => {
+    return {
+        save: (d, h) => { dispatch(save(d, h)) },
+        getList: (q) => { dispatch(getList(q)) },
+        getById: (id) => { dispatch(getById(id)) },
+        update: (d, h) => { dispatch(update(d, h)) },
+    }
+}
+*/
+export default connect(mapStateToProps, {
+    save,
+    getById,
+    update
+
+})(Form)
